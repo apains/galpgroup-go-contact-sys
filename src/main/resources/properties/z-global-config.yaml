@@ -1,0 +1,10 @@
+applicationType: "API"
+
+api:
+  appName: ${project.artifactId}
+  appVersion: ${project.version} 
+
+maskFields:
+  maskingSelectorsList: ['client_secret', 'secure']
+  maskingDefaultValue: "***" 
+  

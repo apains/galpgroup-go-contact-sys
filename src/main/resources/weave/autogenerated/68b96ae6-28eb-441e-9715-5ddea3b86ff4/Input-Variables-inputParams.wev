@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_68b96ae6_28eb_441e_9715_5ddea3b86ff4_Input_Variables_inputParams = Any
+

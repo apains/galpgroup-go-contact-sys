@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="0c88518d-8a49-4bd4-bc7b-9bf82cadad63" responseTimeout="${backend_targets.app-name-api.response.timeout}" >
+		<http:request-connection connectionIdleTimeout="${backend_targets.app-name-api.timeout}" protocol="HTTPS" host="#[Mule::p('backend_targets.app-name-api.host')]">
+		</http:request-connection>
+	</http:request-config>
+	<global-property doc:name="Global Property Env" doc:id="5fbf5329-fab8-4a19-b27b-4ee304c75eea" name="mule.env" value="local" doc:description="mule.env local default"/>
+	<configuration-properties doc:name="Configuration properties" doc:id="96ac39f4-da41-423b-82c0-053fe9b6b69c" doc:description="properties/z-global-config.yaml" file="properties/z-global-config.yaml" />
+	<global-property doc:name="Global Property Secure Key" doc:id="49a57481-009b-4fa1-8f0a-5a437257e305" name="encrypt.key" value="1234567890" doc:description="encrypt.key 1234567890 default"/>
+	<secure-properties:config name="Secure_Properties_Config_App" doc:name="Secure Properties Config" doc:id="37e4b8a6-9072-4ec5-a2b7-4dc3a9745c5c" file="properties/config-${mule.env}-secured.yaml" key="${encrypt.key}" doc:description="properties/config-${mule.env}-secured.yaml ${secure.key}">
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="dca20999-daf5-410c-9395-26297cc8baa0" file="properties/config-${mule.env}.yaml" doc:description="properties/config-${mule.env}.yaml"/>
+	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="56c83351-74f6-4804-9c05-39677a4fa68e" doc:description="${api.id}"/>
+	<global-property doc:name="Global Property" doc:id="ffbe1360-ce87-4836-b930-0be64b837af1" doc:description="anypoint.platform.visualizer.layer=SYSTEM" name="anypoint.platform.visualizer.layer" value="SYSTEM" />
+	<sub-flow name="z-global-config-outboundHeaders" doc:id="32106447-d7c3-48a1-8ece-e8b0eeff3735" >
+		<set-variable value="#[output application/java --- &#10;{&#10;	&quot;x-correlation-id&quot;: correlationId,&#10;	&quot;x-timestamp&quot;: now() as String {format: &quot;yyyy-MM-dd'T'HH:mm:ss.SSSxxx&quot;},&#10;	&quot;content-type&quot;: &quot;application/json; charset=UTF-8&quot;&#10;}]" doc:name="outboundHeaders" doc:id="ae567d2f-ba7c-4ee7-ae86-c77e7cc334b4" variableName="outboundHeaders" />
+	</sub-flow>
+	<sub-flow name="z-global-set-init-variables" doc:id="2790a389-2a76-4a69-ad85-4b0dc1f6790f" >
+		<set-variable value="#[now() as String {format: &quot;yyyy-MM-dd'T'HH:mm:ss.SSSxxx&quot;}]" doc:name="flowStartDate" doc:id="6c2086cf-5ae1-454c-b549-cd2f918feb00" variableName="flowStartDate" />
+		<set-variable value='#[%dw 2.0&#10;output application/json&#10;&#10;var uri = attributes.rawRequestUri as String default ""&#10;var uriParams = attributes.uriParams as Object default {}&#10;&#10;var uriDelimiter = "/"&#10;var uriParamInitWrapper= "("&#10;var uriParamEndWrapper= ")"&#10;&#10;fun getResourceNames(uri:String, delimiter:String) = uri splitBy delimiter&#10;&#10;fun replaceResourceNames(uri:String, params:Object, delimiter:String, initWrapper:String, endWrapper:String) = getResourceNames(uri, uriDelimiter) map ((item, index) -&gt; &#10;    if (((params pluck $) contains item) and (index &gt; 0))&#10;        initWrapper ++ ((params filterObject ($ == item)) pluck $$)[0] as String ++ endWrapper&#10;    else &#10;        item&#10;) joinBy delimiter&#10;&#10;---&#10;replaceResourceNames(uri, uriParams, uriDelimiter, uriParamInitWrapper, uriParamEndWrapper)]' doc:name="serviceURI" doc:id="9a161f46-5c69-4203-acc8-5d8b3ef50799" variableName="serviceURI"/>
+		<set-variable value='#[%dw 2.0&#10;output application/java&#10;---&#10;(lower(attributes.method as String) ++ ":" ++ vars.serviceURI as String) default null]' doc:name="Set var loggingAction" doc:id="52f625e7-795e-4972-9049-5033932f29ef" variableName="loggingAction"/>
+		<set-variable value="#[output application/json&#10;---&#10;if (p('mule.env') != &quot;local&quot;) message.message else message]" doc:name="inputMessage" doc:id="69a6137e-dd37-4dd5-9a1c-21a22ae63384" variableName="inputMessage" />
+		<set-variable value="#[if (attributes.headers.'x-step'?) (attributes.headers.'x-step' as Number) else 1]" doc:name="currentStep" doc:id="be26f9df-438d-4558-81bb-e4c96476a8dd" variableName="currentStep"/>
+		<set-variable value='#[output application/json &#10;--- &#10;{&#10;	"x-api-name": attributes.headers."x-api-name" default "",&#10;	"x-correlation-id": if(attributes.headers."x-correlation-id"?) attributes.headers."x-correlation-id" else correlationId,&#10;	"x-platform": attributes.headers."x-platform" default "",&#10;	"x-user": attributes.headers."x-user" default "",&#10;	"x-timestamp": if(attributes.headers."x-timestamp"?) attributes.headers."x-timestamp" else vars.flowStartDate&#10;}]' doc:name="baseRequestHeaders" doc:id="b2aafa07-f002-4471-8159-19f32cd1926b" variableName="baseRequestHeaders"/>
+		<ee:transform doc:name="Set eCode and eDescription" doc:id="79310f9b-2263-479d-935f-504962b95587" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="eDescription" ><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+				<ee:set-variable variableName="eCode" ><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+				<ee:set-variable variableName="returnedTargetStatusCode" ><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+				<ee:set-variable variableName="returnedTargetDescription" ><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	
+</sub-flow>
+	<sub-flow name="z-global-set-logger-context" doc:id="78e6b403-588b-4749-ad69-4a1a7e1d5a10" >
+		<set-variable value="#[%dw 2.0&#10;var inboundTimeout = if(isEmpty(attributes.headers.'timeout')) 60&#10;    else attributes.headers.'timeout'&#10; &#10;output application/json&#10;---&#10;{&#10;    trackingId: correlationId,&#10;    timeout: inboundTimeout,&#10;    step: vars.currentStep,&#10;    nativeResponse: [], &#10;    eCode: if (vars.'eCode' != null) vars.'eCode' else vars.httpStatus as String default '',&#10;    eDescription: if (vars.'eDescription' != null) vars.'eDescription' else error.detailedDescription default '',&#10;    returnedTargetStatusCode: if (vars.'returnedTargetStatusCode' != null) vars.'returnedTargetStatusCode' else vars.httpStatus as String default '',&#10;    returnedTargetDescription: if (vars.'returnedTargetDescription' != null) vars.'returnedTargetDescription' else error.detailedDescription default '',&#10;    category: '',&#10;    businessKeyGroups: vars.businessParams default []&#10;}]" doc:name="loggerContext" doc:id="c3033763-5487-45b9-b7f7-764436af5afb" variableName="loggerContext"/>
+	</sub-flow>
+
+
+</mule>

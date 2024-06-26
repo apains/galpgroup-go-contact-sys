@@ -1,0 +1,21 @@
+api:
+  id: "" #INSERT API ID FROM API MANAGER
+
+http:
+  private:
+    port: "8091"
+
+backend_targets:
+  app-name-api: #CHANGE TO REAL NAME
+    timeout: "36000"
+    response.timeout: "60000"
+    protocol: "HTTP"
+    host: "localhost"
+    port: "8091"
+    base_path: "/api"
+    resource: "/resourceName"
+    client_id: "${secure::internal.client_id}"
+    client_secret: "${secure::internal.client_secret}"
+    headerValue: ""
+    flows:
+      flow_name1: "path"

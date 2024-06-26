@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<import doc:name="Import"
+		doc:id="4f5a98f6-d007-41a9-ae04-55e4d77ba87f"
+		doc:description="error-handling-lib.xml" file="error-handling-lib.xml" />
+	<import doc:name="Import"
+		doc:id="2db56baa-cecf-4428-b5f4-9655e2f18f21"
+		doc:description="eh-lib-default-error-list.xml"
+		file="eh-lib-default-error-list.xml" />
+		
+<!-- 	<import doc:name="Import Prepare Error Details" -->
+<!-- 		doc:id="28fe8502-6d2b-4d0a-b07d-e941fee23407" -->
+<!-- 		file="operations/eh-lib-prepare-error-details-variables.xml" -->
+<!-- 		doc:description="operations/eh-lib-prepare-error-details-variables.xml" /> -->
+<!-- 	<import doc:name="Import Prepare Error Response" -->
+<!-- 		doc:id="1e722832-50f3-460f-b6c6-b19e75bfa116" -->
+<!-- 		file="operations/eh-lib-prepare-error-response.xml" -->
+<!-- 		doc:description="operations/eh-lib-prepare-error-response.xml" /> -->
+<!-- 	<import doc:name="Import Logging Handler" -->
+<!-- 		doc:id="248a63b1-46ae-4383-84db-e069ee4fb640" -->
+<!-- 		file="operations/eh-lib-post-logging-error.xml" -->
+<!-- 		doc:description="operations/eh-lib-post-logging-error.xml" /> -->
+
+	<configuration
+		doc:name="Configuration global-error-handler"
+		doc:id="62d2f0ce-8515-4478-9371-39443ba63fd7"
+		defaultErrorHandler-ref="global-error-handler" doc:description="global-error-handler" />
+		
+	<configuration-properties
+		doc:name="Configuration properties"
+		doc:id="69400a51-b76a-4ab5-b91d-27f1b1fe067c"
+		file="properties/z-global-config-error-handling.yaml" doc:description="properties/z-global-config-error-handling.yaml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="6790b019-782e-4e71-84f3-6a747dbae09f" file="properties/custom-error-list.yaml" doc:description="properties/custom-error-list.yaml"/>
+		
+		
+</mule>

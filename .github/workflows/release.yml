@@ -1,0 +1,12 @@
+# This workflow will publish a new release
+
+name: Release
+
+on:
+  workflow_dispatch:
+    branches: [ main, main_hf ]
+
+jobs:
+  mule:
+    uses: galpenergia-integration/mulesoft-workflows-library/.github/workflows/RC-workflow.yml@main
+    secrets: inherit

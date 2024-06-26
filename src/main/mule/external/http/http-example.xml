@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="http-exampleFlow" doc:id="68b96ae6-28eb-441e-9715-5ddea3b86ff4" >
+		<http:request method="#[vars.config.http.method]" doc:name="HTTP Request" doc:id="d46e5e2c-1c77-4391-89b1-e538b7094f15" path="#[vars.config.http.path]" config-ref="HTTP_Request_configuration">
+			<http:headers><![CDATA[#[vars.config.http.headers]]]></http:headers>
+			<http:uri-params><![CDATA[#[vars.config.http.uriParams]]]></http:uri-params>
+			<http:query-params><![CDATA[#[vars.config.http.queryParams]]]></http:query-params>
+		</http:request>
+		<flow-ref doc:name="logging-lib-flow-payload" doc:id="25b2700d-055c-474c-9e3f-68bab380eed3" name="logging-lib-flow-payload"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f6282e21-6985-4346-a3e9-4ce958d7fdb6" >
+				<ee:transform doc:name="Override Logging values" doc:id="40b1a329-1537-4e29-9049-445e73c82cb3">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="eDescription"><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+						<ee:set-variable variableName="eCode"><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+						<ee:set-variable variableName="returnedTargetStatusCode"><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+						<ee:set-variable variableName="returnedTargetDescription"><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+						<ee:set-variable variableName="nativeErrors" ><![CDATA[%dw 2.0
+output application/json
+---
+
+[{
+	"code": "native code",
+	"description": "native description"
+}]
+  ]]></ee:set-variable>
+						<ee:set-variable variableName="appendToOutputResponse" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	// "payload": "teste appendToOutputResponse"
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Override Error values" doc:id="9d8046e4-a6b9-44f1-bf02-2dd0ff5d7263" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatusCustom" ><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+						<ee:set-variable variableName="errorMessageCustom" ><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+						<ee:set-variable variableName="errorDescriptionCustom" ><![CDATA[%dw 2.0
+output application/java
+---
+null]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<import doc:name="Import" doc:id="d8cc029c-1a5d-4ef4-ba1f-fcbebdd3bbd7" doc:description="galp-logging-lib.xml" file="galp-logging-lib.xml"/>
+	<global-property doc:name="Global Property" doc:id="24e22f11-48a5-49c3-9e71-9ccdc4262b2e" name="externalLog" value="true" doc:description="default true but to choose: true|false"/>
+	<global-property doc:name="Global Property" doc:id="4ba5d921-cbcf-4204-8e54-a0c93d8a4112" name="log.level" value="DEBUG" doc:description="default DEBUG but can be INFO, ERROR or ADMIN"/>
+	<configuration-properties doc:name="Configuration properties" doc:id="97fef71e-473f-4b5b-9b1c-8da24b245b96" doc:description="properties/z-global-config.yaml" file="properties/z-global-config.yaml" />
+ 
+</mule>

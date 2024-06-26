@@ -1,0 +1,31 @@
+# This workflow will build and deploy a MuleSoft project with Maven to CloudHub
+
+name: Build and Deploy to DEV
+
+on:
+  push:
+    branches: [ develop ]
+  
+  workflow_dispatch:
+
+jobs:
+  mule:
+    uses: galpenergia-integration/mulesoft-workflows-library/.github/workflows/CI-workflow.yml@main
+    secrets: inherit
+
+    with:
+      # **************************************** DEVELOPERS ARE RESPONSIBLE IN MANAGING PARAMETERS BELOW THIS LINE **************************************************************
+      # **************************************** MULE RUNTIME PROPERTIES ********************************************************************************************************
+      muleVersion: 4.4.0                                                    # Mule Version to be deployed - maps to app.runtime
+      deploymentTimeout: 120000                                             # deployment timeout setting
+      workers: 1                                                            # Number of the workers
+      workerType: MICRO                                                     # Size of worker - MICRO (default; 0.1 vCores). SMALL (0.2 vCores) MEDIUM (1 vCore ) LARGE (2 vCores) XLARGE (4 vCores) XXLARGE (8 vCores) 4XLARGE (16 vCores)
+      applicationName: mulesoft-template-domain-example-layer-v1-dev        # Application Name in Runtime Manager. Use the standard format cdio-{mule app name}-{major version}-{env}
+      persistentQueues: false                                               # Shows if persistant queues should be enabled
+      businessGroupId: 688ff8b9-13db-44cb-b398-72735b227900                 # Shows the name of the business group
+      environment: DEV                                                      # this maps to CloudHub Environment Name
+      envConfig: dev                                                        # this maps to mule application {env} properties
+      disableCloudhubLogs: false                                            # Shows if ClouldHub Logs should be enabled
+      objectStoreV2: true                                                   # Shows if object store v2 should be enabled
+      apiLayer: System                                                      # API Layer
+      anypointPlatformAnalyticsAgentEnabled: true                           # Enable Monitoring for Mule app

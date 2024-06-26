@@ -1,0 +1,7 @@
+error-list:
+  CUSTOM:
+    NOT_DATA_FOUND:
+      http-code: "404"
+      message: "Custom message"
+      description: "Custom description"
+      payload: "" 

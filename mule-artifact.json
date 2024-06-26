@@ -1,0 +1,9 @@
+{
+"minMuleVersion": "4.4.0",
+    "secureProperties": [
+        "encrypt.key",
+        "anypoint.platform.client_secret",
+        "backend_targets.galpgroup-logging-proc-api.client_secret",
+        "internal_logging.client_secret"
+        ]
+}

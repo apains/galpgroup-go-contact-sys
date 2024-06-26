@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="implementationSub_Flow" doc:id="e5f2db50-fcdb-445a-af9b-33b8166ef542" >
+		<ee:transform doc:name="Set businessParams and config" doc:id="4476e2ff-767f-4e8c-bcd7-d1293c160479" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="config" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	http: {
+		method: 'POST',
+		path: Mule::p('backend_targets.app-name-api.basePath') ++ Mule::p('backend_targets.app-name-api.resource'), 
+		headers: {
+			"x-step": vars.currentStep + 1
+		} ++ vars.baseRequestHeaders,
+		queryParams: {},
+		uriParams: {}
+	}
+}]]></ee:set-variable>
+				<ee:set-variable variableName="businessParams" ><![CDATA[%dw 2.0
+output application/json skipNullOn = "everywhere"
+---
+[{
+	businessKeys: {
+		headerBK: attributes.headers."bk"
+	}
+},
+{
+	businessKeys: {
+		headerBK2: attributes.headers."bk2"
+	}
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="http-exampleFlow" doc:id="9fb85e2b-ab84-42d7-9067-2644b7298fd2" name="http-exampleFlow"/>
+	</sub-flow>
+	<flow name="implementationFlow" doc:id="8a88b39e-f014-4239-8789-f2a69abf417b" >
+		<ee:transform doc:name="Set var loggingAction" doc:id="5f30bf0b-cedd-49b3-a47c-6084b83e0823" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="loggingAction" ><![CDATA[%dw 2.0
+output application/java
+---
+(flow.name scan(/^.*(?=:application)/))[0][0]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</flow>
+</mule>

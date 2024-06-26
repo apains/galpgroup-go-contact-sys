@@ -1,0 +1,36 @@
+# This workflow will deploy a MuleSoft project with Maven to QUA
+
+name: Deploy to QUA
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The release version you want to deploy:"
+        required: true
+        type: string
+        default: LATEST
+
+jobs:
+  mule:
+    uses: galpenergia-integration/mulesoft-workflows-library/.github/workflows/CD-workflow.yml@main
+    secrets: inherit
+    # **************************************** DEVELOPERS ARE RESPONSIBLE IN MANAGING PARAMETERS BELOW THIS LINE **************************************************************
+    with:
+      # **************************************** MULE RUNTIME PROPERTIES ********************************************************************************************************           
+      groupId: com.galp.mule
+      artifactName: mulesoft-template-domain-example-layer
+      version: ${{ inputs.version }}
+      muleVersion: 4.4.0
+      workers: 1
+      workerType: MICRO
+      applicationName: mulesoft-template-domain-example-layer-v1-qua
+      objectStoreV2: true
+      persistentQueues: false
+      businessGroupId: 688ff8b9-13db-44cb-b398-72735b227900
+      environment: QUA
+      envConfig: qua
+      disableCloudhubLogs: false
+      apiLayer: System 
+      deploymentTimeout: 120000
+      anypointPlatformAnalyticsAgentEnabled: true

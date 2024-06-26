@@ -1,0 +1,17 @@
+api:
+  id: "" #INSERT API ID FROM API MANAGER
+
+http:
+  private:
+    port: "8091"
+
+backend_targets:
+  app-name-api: #CHANGE TO REAL NAME
+    protocol: "HTTPS"
+    host: "eu1.anypoint.mulesoft.com"
+    port: "443"
+    base_path: "/api"
+    client_id: "${secure::internal.client_id}"
+    client_secret: "${secure::internal.client_secret}"
+    flows:
+      flow_name1: "path"
